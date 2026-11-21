@@ -1,17 +1,22 @@
 
-from sqlalchemy import create_engine, URL
+import os
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-DATABASE_URL = URL.create(
-    drivername="mysql+pymysql",
-    username="root",
-    password="reshwanth@2006",
-    host="127.0.0.1",
-    port=3306,
-    database="ecommerce_db"
-)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL, echo=True)
+if DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace(
+        "postgresql://",
+        "postgresql+psycopg://",
+        1
+    )
+else:
+    DATABASE_URL = (
+        "mysql+pymysql://root:@127.0.0.1:3306/ecommerce_db"
+    )
+
+engine = create_engine(DATABASE_URL, echo=False)
 
 SessionLocal = sessionmaker(
     autocommit=False,
