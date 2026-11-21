@@ -10,6 +10,10 @@
     {% endif %}
 
     <form action="/login" method="post">
+
+        <!-- Preserve the page to visit after login -->
+        <input type="hidden" name="next" value="{{ next }}">
+
         <input type="email" name="email"
                placeholder="Enter email" required>
 

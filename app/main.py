@@ -188,13 +188,14 @@ def register(
 
 # Login page
 @app.get("/login")
-def login_page(request: Request):
+def login_page(request: Request, next: str = "/"):
     return templates.TemplateResponse(
         request=request,
         name="login.html",
         context={
             "user": None,
-            "error": None
+            "error": None,
+            "next": next
         }
     )
 
@@ -205,6 +206,7 @@ def login(
     request: Request,
     email: str = Form(...),
     password: str = Form(...),
+    next: str = Form("/"),
     db: Session = Depends(get_db)
 ):
     user = db.query(User).filter(
@@ -217,7 +219,8 @@ def login(
             name="login.html",
             context={
                 "user": None,
-                "error": "Invalid email or password."
+                "error": "Invalid email or password.",
+                "next": next
             },
             status_code=400
         )
@@ -225,8 +228,12 @@ def login(
     request.session.clear()
     request.session["user_id"] = user.id
 
+    # Only allow safe local redirects
+    if not next.startswith("/") or next.startswith("//"):
+        next = "/"
+
     return RedirectResponse(
-        url="/",
+        url=next,
         status_code=303
     )
 
@@ -249,6 +256,15 @@ def add_to_cart(
     request: Request,
     db: Session = Depends(get_db)
 ):
+    # Check whether the user is logged in
+    user = get_current_user(request, db)
+
+    if not user:
+        return RedirectResponse(
+            url="/login?next=/",
+            status_code=303
+        )
+
     product = db.query(Product).filter(
         Product.id == product_id
     ).first()

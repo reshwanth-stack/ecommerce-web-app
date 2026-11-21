@@ -2,21 +2,29 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.engine import make_url
 
 DATABASE_URL = os.getenv("DATABASE_URL")
 
-if DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.replace(
-        "postgresql://",
-        "postgresql+psycopg://",
-        1
-    )
-else:
-    DATABASE_URL = (
-        "mysql+pymysql://root:@127.0.0.1:3306/ecommerce_db"
-    )
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is missing.")
 
-engine = create_engine(DATABASE_URL, echo=False)
+DATABASE_URL = DATABASE_URL.replace(
+    "postgresql://",
+    "postgresql+pg8000://",
+    1
+)
+
+url = make_url(DATABASE_URL)
+
+# Remove parameters unsupported by pg8000
+url = url.difference_update_query(["sslmode", "channel_binding"])
+
+engine = create_engine(
+    url,
+    connect_args={"ssl_context": True},
+    echo=False
+)
 
 SessionLocal = sessionmaker(
     autocommit=False,
