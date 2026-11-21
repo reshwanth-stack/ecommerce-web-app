@@ -1,0 +1,130 @@
+
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - ShopEase{% endblock %}
+
+{% block content %}
+
+<section class="cart-page">
+
+    <div class="cart-heading">
+        <div>
+            <h1>Shopping Cart</h1>
+            <p>Review your selected products before checkout.</p>
+        </div>
+        <a href="/" class="continue-link">← Continue Shopping</a>
+    </div>
+
+    {% if cart_items %}
+
+    <div class="cart-layout">
+
+        <!-- Cart Products -->
+        <div class="cart-products">
+
+            {% for item in cart_items %}
+
+            <div class="cart-product">
+
+                <img
+                    src="{{ item.product.image_url }}"
+                    alt="{{ item.product.name }}"
+                    class="cart-product-image"
+                >
+
+                <div class="cart-product-details">
+                    <h3>{{ item.product.name }}</h3>
+
+                    <p class="cart-description">
+                        {{ item.product.description }}
+                    </p>
+
+                    <p>Price:
+                        <strong>
+                            ₹{{ "%.2f"|format(item.product.price) }}
+                        </strong>
+                    </p>
+
+                    <p>Quantity: {{ item.quantity }}</p>
+
+                    <p class="cart-subtotal">
+                        Subtotal:
+                        ₹{{ "%.2f"|format(item.subtotal) }}
+                    </p>
+                </div>
+
+                <form
+                    action="/cart/remove/{{ item.product.id }}"
+                    method="post"
+                >
+                    <button type="submit" class="remove-btn">
+                        Remove
+                    </button>
+                </form>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- Order Summary -->
+        <aside class="order-summary">
+
+            <h2>Order Summary</h2>
+
+            <div class="summary-row">
+                <span>Products</span>
+                <span>{{ cart_items|length }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span>₹{{ "%.2f"|format(total) }}</span>
+            </div>
+
+            <div class="summary-divider"></div>
+
+            <div class="summary-total">
+                <span>Total</span>
+                <span>₹{{ "%.2f"|format(total) }}</span>
+            </div>
+
+            {% if user %}
+
+            <form action="/checkout" method="post">
+                <button type="submit" class="checkout-btn">
+                    Place Order
+                </button>
+            </form>
+
+            {% else %}
+
+            <p class="login-message">
+                Please <a href="/login">login</a> to place your order.
+            </p>
+
+            {% endif %}
+
+            <a href="/" class="continue-shopping">
+                Continue Shopping
+            </a>
+
+        </aside>
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <h2>Your cart is empty</h2>
+        <p>You haven't added any products yet.</p>
+        <a href="/" class="shop-now-btn">Start Shopping</a>
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

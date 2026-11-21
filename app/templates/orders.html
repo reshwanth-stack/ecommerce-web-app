@@ -1,0 +1,130 @@
+
+{% extends "base.html" %}
+
+{% block title %}My Orders - ShopEase{% endblock %}
+
+{% block content %}
+
+<section class="orders-page">
+
+    <div class="orders-heading">
+        <div>
+            <h1>My Orders</h1>
+            <p>Track and manage your shopping orders.</p>
+        </div>
+
+        <a href="/" class="continue-link">← Continue Shopping</a>
+    </div>
+
+    {% if orders %}
+
+    <div class="orders-list">
+
+        {% for order in orders %}
+
+        <article class="order-card">
+
+            <!-- Order Header -->
+            <div class="order-header">
+
+                <div>
+                    <span class="order-label">ORDER ID</span>
+                    <h3>#{{ order.id }}</h3>
+                </div>
+
+                <span class="order-status
+                    {% if order.status|lower == 'completed' %}
+                        status-completed
+                    {% else %}
+                        status-pending
+                    {% endif %}
+                ">
+                    {{ order.status }}
+                </span>
+
+            </div>
+
+            <!-- Order Information -->
+            <div class="order-information">
+
+                <div>
+                    <span class="order-label">Order Date</span>
+                    <p>
+                        {% if order.created_at %}
+                            {{ order.created_at.strftime('%d %B %Y, %I:%M %p') }}
+                        {% else %}
+                            Date unavailable
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <span class="order-label">Total Amount</span>
+                    <p class="order-total">
+                        ₹{{ "%.2f"|format(order.total_amount) }}
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="order-divider"></div>
+
+            <!-- Ordered Products -->
+            <h4 class="ordered-products-title">Ordered Products</h4>
+
+            <div class="ordered-products">
+
+                {% for item in order.items %}
+
+                <div class="ordered-product">
+
+                    <img
+                        src="{{ item.product.image_url }}"
+                        alt="{{ item.product.name }}"
+                    >
+
+                    <div class="ordered-product-details">
+                        <h4>{{ item.product.name }}</h4>
+                        <p>Quantity: {{ item.quantity }}</p>
+                        <p>
+                            ₹{{ "%.2f"|format(item.price) }} each
+                        </p>
+                    </div>
+
+                    <strong class="ordered-product-price">
+                        ₹{{ "%.2f"|format(item.price * item.quantity) }}
+                    </strong>
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+            <div class="order-footer">
+                <span>Order Total</span>
+                <strong>
+                    ₹{{ "%.2f"|format(order.total_amount) }}
+                </strong>
+            </div>
+
+        </article>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-orders">
+        <div class="empty-orders-icon">📦</div>
+        <h2>No Orders Yet</h2>
+        <p>Your orders will appear here after you complete a purchase.</p>
+        <a href="/" class="shop-now-btn">Start Shopping</a>
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

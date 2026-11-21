@@ -1,0 +1,97 @@
+
+{% extends "base.html" %}
+
+{% block title %}ShopEase - Online Shopping{% endblock %}
+
+{% block content %}
+
+<!-- Welcome Banner -->
+<section class="hero">
+    <h1>Welcome to ShopEase</h1>
+    <p>Discover quality products at great prices.</p>
+    <a href="#products" class="hero-btn">Explore Products</a>
+</section>
+
+<!-- Products Section -->
+<section class="products-section" id="products">
+
+    <div class="section-heading">
+        <div>
+            <h2 class="section-title">Our Products</h2>
+            <p>Find the perfect products for your needs.</p>
+        </div>
+        <span class="product-count">{{ products|length }} Products</span>
+    </div>
+
+    <div class="product-grid">
+
+        {% for product in products %}
+
+        <article class="product-card">
+
+            <div class="product-image">
+                <img
+                    src="{{ product.image_url }}"
+                    alt="{{ product.name }}"
+                    loading="lazy"
+                >
+
+                {% if product.stock > 0 %}
+                    <span class="stock-badge">In Stock</span>
+                {% else %}
+                    <span class="stock-badge out-of-stock">Out of Stock</span>
+                {% endif %}
+            </div>
+
+            <div class="product-info">
+
+                <h3>{{ product.name }}</h3>
+
+                <p class="product-description">
+                    {{ product.description }}
+                </p>
+
+                <div class="product-price">
+                    ₹{{ "%.2f"|format(product.price) }}
+                </div>
+
+                <p class="stock-info">
+                    {{ product.stock }} units available
+                </p>
+
+                {% if product.stock > 0 %}
+
+                <form
+                    action="/cart/add/{{ product.id }}"
+                    method="post"
+                >
+                    <button type="submit" class="add-cart-btn">
+                        Add to Cart
+                    </button>
+                </form>
+
+                {% else %}
+
+                <button class="add-cart-btn disabled-btn" disabled>
+                    Out of Stock
+                </button>
+
+                {% endif %}
+
+            </div>
+
+        </article>
+
+        {% else %}
+
+        <p class="empty-products">
+            No products available at the moment.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endblock %}
