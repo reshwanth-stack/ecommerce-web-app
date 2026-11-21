@@ -8,3 +8,4 @@ passlib
 itsdangerous
 email-validator
 psycopg[binary]
+pg8000
